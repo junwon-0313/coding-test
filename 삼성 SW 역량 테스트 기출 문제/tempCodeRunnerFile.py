@@ -7,6 +7,8 @@ def main():
         rows, cols = len(matrix), len(matrix[0])
         # 회전된 행렬 초기화 (가로와 세로 길이가 바뀜)
         rotated_matrix = [[0] * rows for _ in range(cols)]
+
+        # 원래 행렬의 각 원소를 새로운 행렬로 복사
         for i in range(rows):
             for j in range(cols):
                 rotated_matrix[j][rows - 1 - i] = matrix[i][j]
@@ -15,13 +17,12 @@ def main():
     #불가능할 때 까지 반복
     def magic1(matrix, cnt):
         if cnt ==1:
-            tmp_lst = [matrix[:1],matrix[1:2]]
+            tmp_lst = [matrix[:1]]
+            tmp_lst.append(matrix[1:2])
             rotate_lst = rotate_matrix(tmp_lst)
             rotate_lst.append(matrix[2:])
         else:
-            # print(cnt)
-            # print(matrix)
-            if len(matrix[-1])<cnt+len(matrix):  
+            if len(matrix[-1])<cnt*2+1:
                 return matrix
             tmp_lst = matrix[:-1]
             tmp_lst.append(matrix[-1][:cnt])
@@ -32,21 +33,22 @@ def main():
     
     def adjust_fish(matrix):
         rows, cols = len(matrix), len(matrix[-1])
-        # dx, dy = [0,1,1,-1], [1,0,0,0]
-        dx, dy = [-1,0], [0,1]
+        dx, dy = [0,0,1,-1], [1,-1,0,0]
         change = [[0]*cols for _ in range(rows)]
         for i in range(rows):
-            for j in range(len(matrix[i])):
-                for idx in range(2):
+            for j in range(cols):
+                if i<0 or i >= len(matrix) or j<0 or j >=len(matrix[i]):
+                    continue
+                for idx in range(4):
                     nx, ny = i+dx[idx], j+dy[idx]
                     if 0 <= nx < len(matrix) and 0 <= ny < len(matrix[nx]):
                         # print(i,j, nx,ny, matrix[i][j], matrix[nx][ny])
                         if matrix[i][j]>= matrix[nx][ny]:
                             change[nx][ny] +=((matrix[i][j]- matrix[nx][ny])//5)
                             change[i][j] -=((matrix[i][j]- matrix[nx][ny])//5)
-                        else:
-                            change[i][j] += ((matrix[nx][ny]-matrix[i][j])//5)
-                            change[nx][ny] -= ((matrix[nx][ny]-matrix[i][j])//5)
+                        # else:
+                        #     change[i][j] += 0.5*((matrix[nx][ny]-matrix[i][j])//5)
+                        #     change[nx][ny] -= 0.5*((matrix[nx][ny]-matrix[i][j])//5)
         for i in range(rows):
             for j in range(cols):
                 if i<0 or i >= len(matrix) or j<0 or j >=len(matrix[i]):
@@ -82,13 +84,13 @@ def main():
     #전체 -> k 이하일때까지 재귀
     #가장 작은 어항에 물고기 +1
     def cleaning(first_lst, total_cnt):
-        if (max(first_lst)-min(first_lst))<=K:
+        if (max(linear2_lst)-min(linear2_lst))<=K:
             return total_cnt
         c = min(first_lst)
         for i in range(len(first_lst)):
             if first_lst[i]==c:
                 first_lst[i]+=1
-        # print('#',total_cnt)
+        # print(total_cnt)
         # print(first_lst)
         magic1_lst = magic1(first_lst, 1)
         # print(magic1_lst)
