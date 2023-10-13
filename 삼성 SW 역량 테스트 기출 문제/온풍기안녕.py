@@ -4,41 +4,54 @@ def main():
 
     # 온도, 온풍기 위치, 방향
     # 벽이랑 범위를 초과하지 않으면 온풍기!
-    def fan(start, d, wall, visited, cnt):
+    #BFS!! 방문처리, 5까지의 깊이, 재귀 stack을 사용하는 dfs보다 queue를 사용하는 것이 편리
+    def fan(start, d, wall):
         #cnt=0이면 종료
         r, c = len(temp_graph), len(temp_graph[0])
-        if cnt ==0:
-            return
+        visited = [[False]*c for _ in range(r)]
+        # bfs로 해보기
         x, y =start[0], start[1]
+        dx,dy = direction[d][0],direction[d][1]
+        queue = [(x+dx,y+dy,5)]
 
-        dx, dy = direction[d][0], direction[d][1]
-        nx, ny = x+dx, y+dy
+        while queue:
+            x,y,cnt = queue.pop(0)
+            if cnt<=0:
+                continue
+            if x<0 or x>r-1 or y<0 or y>c-1:
+                continue
 
-        # 전진 시에만
-        if 0<=nx<r and 0<=ny<c:
-            if tuple([(x,y), (nx,ny)]) not in wall and tuple([(nx,ny), (x,y)]) not in wall and not visited[nx][ny]:
+            if visited[x][y]:
+                continue
+            visited[x][y]=True
+            temp_graph[x][y]+=cnt
+            # 직진
+            nx,ny = x+dx, y+dy
+            if 0<=nx<r and 0<=ny<c:
+                if tuple([(x,y), (nx,ny)]) not in wall:
+                    queue.append((nx,ny,cnt-1))
 
-                temp_graph[nx][ny]+=cnt
-                visited[nx][ny]=True
-                fan((nx,ny), d, wall, visited, cnt-1)
+            # 대각선1
+            ux1, uy1 = x+dy, y+dx
+            ux2, uy2 = nx+dy,ny+dx
+            if 0<=ux2<r and 0<=uy2<c:
+                if tuple([(x,y), (ux1, uy1)]) not in wall and tuple([(ux2,uy2), (ux1,uy1)]) not in wall:
+                    queue.append((ux2,uy2, cnt-1))
 
-        # 대각선 이동
-        nx2, ny2 = nx+dy, ny+dx
-        if 0<=nx2<r and 0<=ny2<c:
-            if tuple([(nx,ny), (nx2,ny2)]) not in wall and tuple([(nx2,ny2), (nx,ny)]) not in wall:
-                fan((nx2,ny2), d, wall, visited, cnt-1)
+            # 대각선1
+            dx1, dy1 = x-dy, y-dx
+            dx2, dy2 = nx-dy, ny-dx
+            if 0<=dx2<r and 0<=dy2<c:
+                if tuple([(x,y), (dx1,dy1)]) not in wall and tuple([(dx1,dy1), (dx2,dy2)]) not in wall:
+                    queue.append((dx2,dy2,cnt-1))
 
-        nx3, ny3 = nx-dy, ny-dx
-        if 0<=nx3<r and 0<=ny3<c:
-            if tuple([(nx,ny), (nx3,ny3)]) not in wall and tuple([(nx3,ny3), (nx,ny)]) not in wall:
-                fan((nx3,ny3), d, wall, visited, cnt-1)
 
     # 온도 조절
     def adjust_temp(temp_graph, wall):
         # 오른쪽, 아래 방향만 서치
         dx, dy = (0,1), (1,0)
-        # 임시 저장 후, 일괄 업데이트
-        tmp_graph = [[0]*len(temp_graph[0]) for _ in range(len(temp_graph[0]))]
+        # 임시 저장 후, 일괄 업데이트, 여기서 인덱스 에러! 잘 체크하기
+        tmp_graph = [[0]*len(temp_graph[0]) for _ in range(len(temp_graph))]
         for x in range(len(temp_graph)):
             for y in range(len(temp_graph[0])):
                 for k in range(2):
@@ -46,7 +59,7 @@ def main():
                     nx, ny = x+dx[k], y+dy[k]
                     if nx<0 or nx>len(temp_graph)-1 or ny<0 or ny > len(temp_graph[0])-1:
                         continue
-                    if tuple([(x,y), (nx,ny)]) in wall or tuple([(nx,ny), (x,y)]) in wall:
+                    if tuple([(x,y), (nx,ny)]) in wall:
                         continue
                     if temp_graph[nx][ny]>= temp_graph[x][y]:
                         tmp_graph[nx][ny]-=(temp_graph[nx][ny]- temp_graph[x][y])//4
@@ -96,8 +109,10 @@ def main():
         x, y, w = (map(int,input().split()))
         if w ==0:
             wall.add(tuple([(x-1,y-1), (x-2,y-1)]))
+            wall.add(tuple([ (x-2,y-1),(x-1,y-1)]))
         elif w ==1:
             wall.add(tuple([(x-1,y-1),(x-1,y)]))
+            wall.add(tuple([(x-1,y),(x-1,y-1)]))
 
     # 온도를 조사해야 하는 칸
     search_lst = []
@@ -121,7 +136,7 @@ def main():
         # 온풍기 작동
         for idx in range(len(fan_lst)):
             x,y, dir = fan_lst[idx]
-            fan((x,y), dir-1, wall, [[False]*C for _ in range(R)],5)
+            fan((x,y), dir-1, wall)
         # 온도 조절
         temp_graph = adjust_temp(temp_graph, wall)
         #초콜릿 먹기
