@@ -44,7 +44,6 @@ def main():
         
         
     def move_rudolph():
-        nonlocal rudolph_pos
         ru_x, ru_y = rudolph_pos
         near_santa=[]
         # 가장 가까운 산타에게 돌진
@@ -69,7 +68,7 @@ def main():
             dy=0
         ru_x, ru_y = ru_x+dx, ru_y+dy
         #루돌프 위치 갱신
-        rudolph_pos=[ru_x,ru_y]
+        rudolph_pos[0], rudolph_pos[1]=ru_x,ru_y
         # 도착 지점에 산타가 있을 때
         if ru_x == sa_x and ru_y==sa_y:
             crash_rudolph(sa_x,sa_y,dx,dy, santa_num)
@@ -94,7 +93,6 @@ def main():
         
         
     def move_santa(santa_num):
-        nonlocal rudolph_pos
         ru_x, ru_y = rudolph_pos
         x,y = santa_lst[santa_num][0], santa_lst[santa_num][1]
         dis = (ru_x-x)**2+(ru_y-y)**2
