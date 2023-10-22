@@ -36,6 +36,5 @@ def main():
     # 초기 구슬 1,2,3의 개수
     
 
-
 if __name__ == "__main__":
     main()
