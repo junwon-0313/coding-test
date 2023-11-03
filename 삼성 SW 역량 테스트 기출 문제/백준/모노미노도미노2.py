@@ -87,12 +87,12 @@ def main():
                     break
             else:
                 green_rows.append(x)
-                
+
         score = score + len(blue_cols) + len(green_rows)
         return blue_cols, green_rows, score
-    
+
     # 0~1번 행과 열에 값이 있을 경우 1~2칸 밀기
-    def push_block(blue_cols, green_rows):
+    def push_block():
         new_blue = [[0] * 6 for _ in range(4)]
         new_green = [[0] * 4 for _ in range(6)]
         blue_over, green_over = 0, 0
@@ -106,6 +106,7 @@ def main():
             for y in range(4):
                 if green[x][y] == 1:
                     green_over += 1
+                    break
 
         for x in range(4):
             for y in range(6 - blue_over):
@@ -114,34 +115,8 @@ def main():
         for x in range(6 - green_over):
             for y in range(4):
                 new_green[x + green_over][y] = green[x][y]
-        # 만약 사라지는 칸에 6번이나 5번이 포함되는 경우, 
-        new_blue_cols = []
-        new_green_rows = []
-        if blue_over==1:
-            for i in blue_cols:
-                if i ==5:
-                    continue
-                new_blue_cols.append(i+1)
-        elif blue_over ==2:
-            for i in blue_cols:
-                if i==4 or i ==5 :
-                    continue
-                new_blue_cols.append(i+2)
-        if green_over==1:
-            for i in green_rows:
-                if i ==5:
-                    continue
-                new_green_rows.append(i+1)
-        elif green_over ==2:
-            for i in green_rows:
-                if i==4 or i ==5:
-                    continue
-                new_green_rows.append(i+2)
-        if blue_over ==0:
-            new_blue_cols = blue_cols
-        if green_over ==0:
-            new_green_rows = green_rows
-        return new_blue, new_green, new_blue_cols, new_green_rows
+
+        return new_blue, new_green
 
     def move_down(blue, green, blue_cols, green_rows):
         if len(blue_cols) == 0:
@@ -170,20 +145,21 @@ def main():
                     elif x > row:
                         new_green[x][y] = green[x][y]
             green = new_green
-        return blue,green
-        
+        return blue, green
+
     # print_domino()
     for block in block_lst:
-        print('Add block',block)
+        # print('Add block',block)
         stack_block(block)
         blue_cols, green_rows, score = pop_block(score)
-        blue, green,blue_cols, green_rows = push_block(blue_cols, green_rows)
         blue, green = move_down(blue, green, blue_cols, green_rows)
-        print_domino()
-        
+        blue, green = push_block()
+        # print_domino()
+
     # 결과 출력
     print(score)
     print(count_block(blue) + count_block(green))
+
 
 if __name__ == "__main__":
     main()
