@@ -55,5 +55,6 @@ def main():
                         total_min = local_min
     print(total_min)
 
+
 if __name__ == "__main__":
     main()

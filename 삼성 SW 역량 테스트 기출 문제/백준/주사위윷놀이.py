@@ -1,6 +1,8 @@
 import copy
 
 max_score = 0
+
+
 def main():
     dice = list(map(int, input().split()))
     # 윷놀이 판, 말은 4개

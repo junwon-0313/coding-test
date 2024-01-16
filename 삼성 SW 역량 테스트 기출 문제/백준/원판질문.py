@@ -60,7 +60,6 @@ def removeNum():
     for x in range(n):
         for y in range(m):
             if circle[x][y] != 0:
-                
                 q = deque()
                 q.append([x, y, circle[x][y]])
 
@@ -83,6 +82,7 @@ def removeNum():
                             q.append([nx, ny, target])
                             flag = True
     return flag, circle
+
 
 def adjust():
     hap = 0
@@ -107,18 +107,20 @@ def adjust():
             elif circle[x][y] < average:
                 circle[x][y] += 1
 
+
 def rotateTarget(target, direction, time):
     for i in range(n):
         if (i + 1) % target == 0:
             for _ in range(time):
                 rotate(i, direction)
 
+
 # 동작
 for target, direction, time in rotateData:
     # 회전
     rotateTarget(target, direction, time)
     # 터트리기 or 값 조정
-    flag,circle = removeNum()
+    flag, circle = removeNum()
     if not flag:
         adjust()
 
